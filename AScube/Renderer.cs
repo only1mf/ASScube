@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.Numerics;
 using ClickableTransparentOverlay;
 using ImGuiNET;
-using Vortice.Mathematics.PackedVector;
 
 namespace AScube
 {
@@ -14,9 +13,15 @@ namespace AScube
         private float fallFovVal = 90; // Fallback value
 
         // Check boxes 
-        public bool checkBoxInfAmmo = false; // Made public
+        public bool checkBoxInfAmmo = false;
         public bool checkBoxInfClip = false;
         public bool checkBoxBhop = false;
+        public bool checkBoxCords0 = false;
+
+        // Position values
+        public int XVal = 0;
+        public int YVal = 0;
+        public int ZVal = 0;
 
         // RGBA
         Vector4 colorVal = new Vector4(1, 1, 1, 1);
@@ -33,7 +38,7 @@ namespace AScube
             }
 
             // Begin window
-            ImGui.Begin("AScube");
+            ImGui.Begin("ASScube");
 
             // Get the current window position and size
             Vector2 windowPos = ImGui.GetWindowPos();
@@ -48,11 +53,21 @@ namespace AScube
                     {
                         fovVal = fallFovVal;
                     }
-                    ImGui.Checkbox("inf ammo", ref checkBoxInfAmmo); // Removed the semicolon
-
+                    ImGui.Checkbox("inf ammo", ref checkBoxInfAmmo);
                     ImGui.Checkbox("inf clip", ref checkBoxInfClip);
+                    ImGui.Checkbox("bhop", ref checkBoxBhop);
+                    ImGui.Checkbox("Set Coords to 1", ref checkBoxCords0);
 
-                    //ImGui.Checkbox("B-hop", ref checkBoxBhop); work in progress;)
+                    ImGui.Separator();
+
+                    // Set a fixed size for the input boxes
+                    ImGui.PushItemWidth(100);
+                    ImGui.InputInt("X", ref XVal);
+                    ImGui.SameLine();
+                    ImGui.InputInt("Y", ref YVal);
+                    ImGui.SameLine();
+                    ImGui.InputInt("Z", ref ZVal);
+                    ImGui.PopItemWidth(); // Reset the item width to its default value
 
                     ImGui.Separator();
 
@@ -109,15 +124,13 @@ namespace AScube
             // Set padding and spacing
             style.WindowPadding = new Vector2(10, 10);
             style.FramePadding = new Vector2(5, 5);
-            style.ItemSpacing = new Vector2(5, 5);
+            style.ItemSpacing = new Vector2(10, 10);
         }
 
         private void DrawOutline(Vector2 windowPos, Vector2 windowSize)
         {
-            var drawList = ImGui.GetBackgroundDrawList();
-            Vector2 outlineStart = windowPos - new Vector2(1, 1);
-            Vector2 outlineEnd = windowPos + windowSize + new Vector2(1, 1);
-            drawList.AddRect(outlineStart, outlineEnd, ImGui.ColorConvertFloat4ToU32(new Vector4(0, 255, 0, 1)), 5.0f, ImDrawFlags.None, 2.0f);
+            var drawList = ImGui.GetWindowDrawList();
+            drawList.AddRect(windowPos, windowPos + windowSize, ImGui.ColorConvertFloat4ToU32(new Vector4(0, 255, 0, 1)), 5.0f, ImDrawFlags.None, 2.0f);
         }
 
         private void OpenUrl(string url)
